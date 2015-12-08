@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ReGen</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+
+      button {
+        display: block;
+        margin: 3px;
+        padding: 3px;
+      }
+
+      .text-field {
+        display: inline-block;
+        min-width: 150px;
+        padding: 3px 10px;
+        margin: 3px;
+        border: solid gray 1px;
+      }
+    </style>
+    <script>
+      function generateNumericString(length) {
+        var result = '';
+        for (var i = 0; i < length; i++) {
+          result += Math.floor(Math.random() * 10);
+        }
+        return result;
+      };
+
+      function Snils()
+      {
+        var calcChecksum = function (snils){
+          var cs = 0;
+          for (var i=0; i<9; i++){
+            cs += snils[i] * (9 - i)
+          }
+          if (cs != 100) cs %= 101;
+          var checksum = "" + Math.floor(cs / 10) + Math.floor(cs % 10);
+          return checksum;
+        };
+
+       	var core = generateNumericString(9);
+        var checksum = calcChecksum(core);
+
+        var _value = core + checksum;
+        this.value = function() {
+          return _value;
+        };
+
+        var _format = '';
+        this.format = function() {
+          if (_format && '' != _format)
+            return _format;
+
+          for (i in _value) {
+            _format += _value[i];
+            if (2 == i%3){
+              if (8 == i) {
+                _format += ' ';
+              } else {
+                _format += '-';
+              }
+            }
+          }
+          return _format;
+        };
+      };
+
+      function Guid() {
+        var s4 = function() {
+          return Math.floor((1 + Math.random()) * 0x10000)
+                     .toString(16)
+                     .substring(1);
+        };
+
+        var s8_1  = s4() + s4();
+        var s4_2  = s4();
+        var s4_3  = s4();
+        var s4_4  = s4();
+        var s12_5 = s4() + s4() + s4();
+
+        this.value = function(){
+          return s8_1 + s4_2 + s4_3 + s4_4 + s12_5;
+        };
+
+        this.format = function(){
+          return s8_1 + '-' + s4_2 + '-' + s4_3 + '-' + s4_4 + '-' + s12_5;
+        };
+      };
+
+      function generateAndInsertSnils(snilsOut, formatedSnilsOut)
+      {
+        var snils = new Snils();
+        document.getElementById(snilsOut).innerHTML = snils.value();
+        document.getElementById(formatedSnilsOut).innerHTML = snils.format();
+      }
+
+      function generateAndInsertGuid(guidOut, formatedGuidOut, upperCaseCheckBox) {
+        var cbEl = document.getElementById(upperCaseCheckBox);
+        var isUpperCase = cbEl.checked;
+        var guid = new Guid();
+        var guidVal = guid.value();
+        var guidFormatVal = guid.format();
+
+        document.getElementById(guidOut).innerHTML = isUpperCase ? guidVal.toUpperCase() : guidVal;
+        document.getElementById(formatedGuidOut).innerHTML = isUpperCase ? guidFormatVal.toUpperCase() : guidFormatVal;
+      }
+
+    </script>
+  <script>(function fixExternalLinks() {
+              function pointToBlank(a) {
+                var href = a.getAttribute("href");
+                if (href && href.indexOf("//") > -1) {
+                  // this is an external link.
+                  if(!a.getAttribute("target")) {
+                    a.setAttribute("target", "_blank");
+                  }
+                }
+              }
+              function fixLinks() {
+                document.removeEventListener("DOMContentLoaded", fixLinks);
+                var anchors = document.querySelectorAll("a");
+                var asArray = Array.prototype.slice.call(anchors);
+                asArray.forEach(function(a) {
+                  pointToBlank(a);
+                });
+              }
+              document.addEventListener("DOMContentLoaded", fixLinks);
+            }())</script>
+</head>
+  <body>
+    <h1>Генератор реквизитов</h1>
+
+    <h2>СНИЛС</h2>
+    <button onclick="generateAndInsertSnils('snils', 'dashed-snils')">Генерировать</button>
+    <span id="snils" class="text-field">&nbsp;</span>
+    <span id="dashed-snils" class="text-field">&nbsp;</span>
+
+    <h2>Guid</h2>
+    <input id="guid-uppercase-checkbox" type="checkbox" checked="true" />
+    <label for="guid-uppercase-checkbox">UPPER CASE</label>
+    <button onclick="generateAndInsertGuid('guid', 'dashed-guid', 'guid-uppercase-checkbox')">Генерировать</button>
+    <span id="guid" class="text-field">&nbsp;</span>
+    <span id="dashed-guid" class="text-field">&nbsp;</span>
+  </body>
+</html>
