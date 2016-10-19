@@ -31,9 +31,8 @@
         return result;
       };
 
-      function Snils()
-      {
-        var calcChecksum = function (snils){
+      function Snils() {
+        var calcChecksum = function (snils) {
           var cs = 0;
           for (var i=0; i<9; i++){
             cs += snils[i] * (9 - i)
@@ -92,6 +91,38 @@
         };
       };
 
+      function Inn(isPersonal) {
+        var calcChecksum = function (innCore) {
+          if (innCore.length === 9)
+          {
+            var n = innCore
+            var n9 = ((2*n[0] + 4*n[1] + 10*n[2] + 3*n[3] + 5*n[4] + 9*n[5] + 4*n[6] + 6*n[7] + 8*n[8]) % 11) % 10
+            return n9.toString();
+          } else if (innCore.length === 10) {
+            var n = innCore
+            var n10 = ((7*n[0] + 2*n[1] + 4*n[2] + 10*n[3] + 3*n[4] + 5*n[5] + 9*n[6] + 4*n[7] + 6*n[8] + 8*n[9]) % 11) % 10
+            var n11 = ((3*n[0] + 7*n[1] + 2*n[2] + 4*n[3] + 10*n[4] + 3*n[5] + 5*n[6] + 9*n[7] + 4*n[8] + 6*n[9] + 8*n10) % 11) % 10
+            return n10.toString() + n11.toString();            
+          } else {
+            return "0";
+          }
+
+
+        }
+        
+        var core;
+        if (isPersonal){
+          core = generateNumericString(10);
+        } else {
+          core = generateNumericString(9);
+        }
+        var checksum = calcChecksum(core);
+        var _value = core + checksum;        
+        this.value = function(){
+          return _value;
+        }
+      }
+
       function generateAndInsertSnils(snilsOut, formatedSnilsOut)
       {
         var snils = new Snils();
@@ -110,6 +141,13 @@
         document.getElementById(formatedGuidOut).innerHTML = isUpperCase ? guidFormatVal.toUpperCase() : guidFormatVal;
       }
 
+      function generateAndInsertInn(innOut, personalInnCheckBoxId)
+      {
+        isPersonalCheckBox = document.getElementById(personalInnCheckBoxId)
+        var inn = new Inn(isPersonalCheckBox.checked);
+        document.getElementById(innOut).innerHTML = inn.value();
+      }
+
     </script>
 </head>
   <body>
@@ -120,8 +158,14 @@
     <span id="snils" class="text-field">&nbsp;</span>
     <span id="dashed-snils" class="text-field">&nbsp;</span>
 
+    <h2>ИНН</h2>
+    <input type="checkbox" id="inn-personal-checkbox" />
+    <label for="inn-personal-checkbox">ИНН физ. лица</label>
+    <button onclick="generateAndInsertInn('inn', 'inn-personal-checkbox')">Генерировать</button>
+    <span id="inn" class="text-field">&nbsp;</span>
+
     <h2>Guid</h2>
-    <input id="guid-uppercase-checkbox" type="checkbox" checked="true" />
+    <input id="guid-uppercase-checkbox" type="checkbox" checked="checked" />
     <label for="guid-uppercase-checkbox">UPPER CASE</label>
     <button onclick="generateAndInsertGuid('guid', 'dashed-guid', 'guid-uppercase-checkbox')">Генерировать</button>
     <span id="guid" class="text-field">&nbsp;</span>
